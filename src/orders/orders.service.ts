@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { defaultPagination } from 'src/global/pagination';
 import { PrismaService } from 'src/services/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+
+interface FindAllParams {
+  skip?: number;
+  take?: number;
+}
 
 @Injectable()
 export class OrdersService {
@@ -13,8 +19,11 @@ export class OrdersService {
     });
   }
 
-  findAll() {
-    return this.prisma.order.findMany();
+  findAll({ skip, take }: FindAllParams) {
+    return this.prisma.order.findMany({
+      skip: isNaN(skip) ? 0 : skip,
+      take: isNaN(take) ? defaultPagination.size : take,
+    });
   }
 
   findOne(id: string) {
